@@ -1,0 +1,6 @@
+[
+  { "ts": "2026-08-07T09:10:00Z", "severity": "INFO", "msg": "Batch-Lauf begonnen", "batch": 42 },
+  { "ts": "2026-08-07T09:10:05Z", "severity": "WARNING", "msg": "Datensatz übersprungen", "recordId": 88, "reason": "leeres Feld" },
+  { "ts": "2026-08-07T09:10:09Z", "severity": "ERROR", "msg": "Validierung fehlgeschlagen", "recordId": 91, "fields": ["email", "plz"] },
+  { "ts": "2026-08-07T09:10:12Z", "severity": "INFO", "msg": "Batch-Lauf beendet", "batch": 42, "processed": 118, "skipped": 3 }
+]

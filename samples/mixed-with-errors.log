@@ -1,0 +1,18 @@
+{
+  "time": 1754553600000,
+  "lvl": 50,
+  "msg": "Pretty-printed Eintrag über mehrere Zeilen",
+  "context": { "requestId": "abc-123", "user": "helpdesk" }
+}
+{
+  "time": 1754553601000,
+  "lvl": 30,
+  "msg": "Zweiter Eintrag",
+  "tags": ["sync", "ok"]
+}
+DIESE ZEILE IST KEIN JSON und soll übersprungen werden
+{
+  "time": 1754553602000,
+  "lvl": 40,
+  "msg": "Dritter Eintrag nach defekter Zeile"
+}

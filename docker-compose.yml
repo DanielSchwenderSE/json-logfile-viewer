@@ -1,0 +1,25 @@
+# JSON Log Viewer – Betrieb per Docker.
+# Anpassen über eine .env-Datei neben dieser Datei (siehe README).
+services:
+  app:
+    build: .
+    image: json-log-viewer
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      # WICHTIG: in Produktion ein langes, zufälliges Secret setzen!
+      SESSION_SECRET: ${SESSION_SECRET:-bitte-unbedingt-aendern}
+      # Initiales Admin-Konto beim ersten Start (nur wenn noch keine Nutzer existieren).
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      # Hinter HTTPS-Reverse-Proxy auf true setzen:
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      DATA_DIR: /app/data
+    volumes:
+      - jlv-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  jlv-data:

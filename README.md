@@ -77,13 +77,13 @@ Dateien von Express ausgeliefert).
 
 ### Konfiguration (`.env`)
 
-| Variable | Bedeutung | Standard |
-| --- | --- | --- |
-| `SESSION_SECRET` | Geheimnis zum Signieren der Session-Cookies — **in Produktion setzen!** | `bitte-unbedingt-aendern` |
-| `ADMIN_USER` | Benutzername des initialen Admin-Kontos (nur bei erstem Start) | `admin` |
-| `ADMIN_PASSWORD` | Passwort des initialen Admin-Kontos (nur bei erstem Start) | `admin` (mit Warnung im Log) |
-| `COOKIE_SECURE` | Cookie nur über HTTPS senden — bei Betrieb hinter TLS-Reverse-Proxy auf `true` | `false` |
-| `TRUST_PROXY` | Express `trust proxy` aktivieren — nötig hinter nginx/Traefik mit HTTPS | `false` |
+| Variable         | Bedeutung                                                              | Standard                     |
+|------------------|-------------------------------------------------------------------------|-------------------------------|
+| `SESSION_SECRET` | Geheimnis zum Signieren der Session-Cookies — **in Produktion setzen!** | `bitte-unbedingt-aendern`     |
+| `ADMIN_USER`     | Benutzername des initialen Admin-Kontos (nur bei erstem Start)         | `admin`                       |
+| `ADMIN_PASSWORD` | Passwort des initialen Admin-Kontos (nur bei erstem Start)             | `admin` (mit Warnung im Log)  |
+| `COOKIE_SECURE`  | Cookie nur über HTTPS senden — bei Betrieb hinter TLS-Reverse-Proxy auf `true` | `false`                |
+| `TRUST_PROXY`    | Express `trust proxy` aktivieren — nötig hinter nginx/Traefik mit HTTPS | `false`                       |
 
 Benutzerkonten liegen im Docker-Volume `jlv-data` (`/app/data/users.json`).
 Weitere Konten nachträglich anlegen:

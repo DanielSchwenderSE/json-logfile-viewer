@@ -1,0 +1,8 @@
+{"timestamp":"2026-08-07T08:00:01.120Z","level":"info","message":"Service gestartet","service":"api","pid":1423}
+{"timestamp":"2026-08-07T08:00:02.340Z","level":"debug","message":"Konfiguration geladen","config":{"port":3001,"db":"sqlite"}}
+{"timestamp":"2026-08-07T08:01:15.001Z","level":"warn","message":"Langsame Anfrage","durationMs":1450,"path":"/api/tickets"}
+{"timestamp":"2026-08-07T08:02:03.777Z","level":"error","message":"Datenbankverbindung verloren","error":{"code":"ECONNRESET","stack":"Error: ECONNRESET\n    at TCP.onStreamRead (node:internal/stream_base_commons:217)"}}
+{"timestamp":"2026-08-07T08:02:04.010Z","level":"info","message":"Erneuter Verbindungsversuch","attempt":1}
+{"timestamp":"2026-08-07T08:02:05.512Z","level":"info","message":"Datenbank wieder verbunden","attempt":2}
+{"timestamp":1754553735,"level":"trace","message":"Heartbeat","unixSeconds":true}
+{"timestamp":"2026-08-07T08:05:59.999Z","level":"error","message":"Ticket-Sync fehlgeschlagen","ticketId":"T-10492","user":"m.muster","retryable":true}
