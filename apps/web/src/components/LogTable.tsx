@@ -70,11 +70,24 @@ export default function LogTable({ rows, mapping, extraColumns, terms, highlight
     // Aufklapp-Zustand tatsächlich gezeichnet hat – sonst rechnet der
     // Virtualizer mit den alten (veralteten) Zeilenhöhen und die Zielposition
     // stimmt nicht mehr, was zu überlappenden Zeilen führt.
+    //
+    // Die Zielzeile wird beim ersten scrollToIndex erst ins DOM gemountet;
+    // ihre echte (hohe) Größe misst der Virtualizer asynchron per
+    // ResizeObserver, also einen weiteren Frame später. Ohne einen zweiten
+    // Korrektur-Scroll bleibt der Scroll-Offset auf der anhand der
+    // Schätzgröße (34px) berechneten Position stehen, während sich der
+    // Inhalt darunter/darüber bereits verschoben hat – das erzeugt eine
+    // Lücke bzw. optisch "hängenbleibende" Inhalte.
     if (pendingScrollRef.current != null) cancelAnimationFrame(pendingScrollRef.current)
     pendingScrollRef.current = requestAnimationFrame(() => {
       pendingScrollRef.current = requestAnimationFrame(() => {
         virtualizer.scrollToIndex(index, { align: 'center' })
-        pendingScrollRef.current = null
+        pendingScrollRef.current = requestAnimationFrame(() => {
+          pendingScrollRef.current = requestAnimationFrame(() => {
+            virtualizer.scrollToIndex(index, { align: 'center' })
+            pendingScrollRef.current = null
+          })
+        })
       })
     })
 

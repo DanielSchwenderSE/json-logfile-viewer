@@ -166,9 +166,9 @@ export default function Viewer() {
     setActiveLevels(new Set(presentLevels))
   }, [presentLevels])
 
+  // Zeigt nur Level-/Zeitraum-Filter — die Textsuche filtert absichtlich NICHT das
+  // obere Panel, sondern nur das SearchResultsPanel (siehe allSearchResults unten).
   const filtered = useMemo(() => {
-    const query = parseQuery(search)
-    const emptyQuery = isEmptyQuery(query)
     const fromMs = localInputToMs(timeFrom)
     const toMs = localInputToMs(timeTo)
     const levelActive = (l: LevelKey) => activeLevels.has(l)
@@ -177,10 +177,9 @@ export default function Viewer() {
       if (!levelActive(r.levelKey)) return false
       if (fromMs != null && r.tsMs != null && r.tsMs < fromMs) return false
       if (toMs != null && r.tsMs != null && r.tsMs > toMs) return false
-      if (!emptyQuery && !matchesQuery(r, query)) return false
       return true
     })
-  }, [rows, search, activeLevels, timeFrom, timeTo])
+  }, [rows, activeLevels, timeFrom, timeTo])
 
   // Such-Ergebnisse (ungefiltert)
   const allSearchResults = useMemo(() => {

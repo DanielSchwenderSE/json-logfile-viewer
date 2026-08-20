@@ -49,15 +49,35 @@ interface DetectionResult {
   confidence: number
 }
 
+const MAX_DETECTION_SAMPLE = 300
+
+/**
+ * Wählt bis zu `MAX_DETECTION_SAMPLE` nicht-leere Zeilen gleichmäßig über die ganze Datei
+ * verteilt aus. Ein rein sequenzieller Sample vom Dateianfang wäre anfällig für lokale
+ * Cluster aus mehrzeiligem Freitext (z. B. ein langer Report ohne eigene Zeitstempel direkt
+ * am Anfang), die die Erkennung fälschlich scheitern lassen, obwohl das Format über die
+ * gesamte Datei hinweg klar erkennbar ist.
+ */
+function sampleLines(lines: string[]): string[] {
+  const nonBlank = lines.map((l) => l.trim()).filter((l) => l !== '')
+  if (nonBlank.length <= MAX_DETECTION_SAMPLE) return nonBlank
+
+  const step = nonBlank.length / MAX_DETECTION_SAMPLE
+  const sample: string[] = []
+  for (let i = 0; i < MAX_DETECTION_SAMPLE; i++) {
+    sample.push(nonBlank[Math.floor(i * step)])
+  }
+  return sample
+}
+
 function detectPattern(lines: string[]): DetectionResult {
   if (lines.length === 0) return { pattern: null, confidence: 0 }
 
-  const hits: Record<string, number> = {}
-  const sampleSize = Math.min(lines.length, 20)
+  const sample = sampleLines(lines)
+  if (sample.length === 0) return { pattern: null, confidence: 0 }
 
-  for (let i = 0; i < sampleSize; i++) {
-    const line = lines[i].trim()
-    if (!line) continue
+  const hits: Record<string, number> = {}
+  for (const line of sample) {
     for (const p of PATTERNS) {
       if (p.regex.test(line)) {
         hits[p.name] = (hits[p.name] ?? 0) + 1
@@ -69,7 +89,7 @@ function detectPattern(lines: string[]): DetectionResult {
   if (sorted.length === 0) return { pattern: null, confidence: 0 }
 
   const [bestName, bestCount] = sorted[0]
-  const confidence = bestCount / sampleSize
+  const confidence = bestCount / sample.length
 
   const pattern = PATTERNS.find((p) => p.name === bestName) ?? null
   return { pattern, confidence }
