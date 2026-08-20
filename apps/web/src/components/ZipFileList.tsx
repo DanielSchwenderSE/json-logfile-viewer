@@ -1,4 +1,5 @@
 import type { ZipLogFile } from '../lib/unzip'
+import ZipFileTree from './ZipFileTree'
 
 interface Props {
   zipName: string
@@ -37,30 +38,14 @@ export default function ZipFileList({ zipName, files, onSelect, onCancel }: Prop
           </button>
         </div>
 
-        {files.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-500">
-            Keine Logdateien im Paket gefunden (.json, .jsonl, .ndjson, .log, .txt).
-          </p>
-        ) : (
-          <ul className="max-h-96 divide-y divide-slate-100 overflow-auto dark:divide-slate-800">
-            {files.map((f) => (
-              <li key={f.path}>
-                <button
-                  onClick={() => onSelect(f)}
-                  className="flex w-full items-center justify-between gap-3 px-2 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800"
-                >
-                  <span className="truncate">
-                    <span className="mono text-sm">{f.name}</span>
-                    {f.path !== f.name && (
-                      <span className="ml-2 text-xs text-slate-400">{f.path}</span>
-                    )}
-                  </span>
-                  <span className="shrink-0 text-xs text-slate-400">{humanSize(f.size)}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="flex h-[28rem] flex-col">
+          <ZipFileTree
+            files={files}
+            onSelect={onSelect}
+            renderMeta={(f) => humanSize(f.size)}
+            emptyMessage="Keine Logdateien im Paket gefunden (.json, .jsonl, .ndjson, .log, .txt, .xml)."
+          />
+        </div>
       </div>
     </div>
   )

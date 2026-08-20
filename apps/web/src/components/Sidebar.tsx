@@ -1,5 +1,6 @@
 import { useAppStore } from '../store'
 import type { OpenZip } from '../lib/types'
+import ZipFileTree from './ZipFileTree'
 
 interface Props {
   openZip: OpenZip | null
@@ -32,8 +33,8 @@ export default function Sidebar({ openZip, onSelectZipFile }: Props) {
   }
 
   return (
-    <div className="w-64 border-r border-slate-200 bg-slate-50 overflow-auto dark:border-slate-800 dark:bg-slate-900/50">
-      <div className="sticky top-0 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-800">
+    <div className="flex min-h-0 w-64 flex-col border-r border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50">
+      <div className="sticky top-0 shrink-0 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-800">
         <div className="flex items-center justify-between gap-2">
           <span className="mono truncate text-xs font-medium" title={openZip.name}>
             {openZip.name}
@@ -48,22 +49,12 @@ export default function Sidebar({ openZip, onSelectZipFile }: Props) {
         </div>
       </div>
 
-      <div className="divide-y divide-slate-100 dark:divide-slate-800">
-        {openZip.files.map((file) => (
-          <button
-            key={file.path}
-            onClick={() => onSelectZipFile(file.path, file.name)}
-            className="w-full px-3 py-2 text-left hover:bg-blue-50 dark:hover:bg-slate-800 transition"
-          >
-            <div className="mono truncate text-xs font-medium text-slate-700 dark:text-slate-300">
-              {file.name}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              {file.size ? `${(file.size / 1024).toFixed(1)} KB` : '—'} · {formatDate(file.modDate)}
-            </div>
-          </button>
-        ))}
-      </div>
+      <ZipFileTree
+        files={openZip.files}
+        onSelect={(f) => onSelectZipFile(f.path, f.name)}
+        renderMeta={(f) => `${f.size ? `${(f.size / 1024).toFixed(1)} KB` : '—'} · ${formatDate(f.modDate)}`}
+        emptyMessage="Keine Dateien"
+      />
     </div>
   )
 }
