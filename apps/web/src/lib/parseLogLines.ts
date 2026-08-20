@@ -47,9 +47,12 @@ const PATTERNS: LogLinePattern[] = [
 interface DetectionResult {
   pattern: LogLinePattern | null
   confidence: number
+  bestCount: number
 }
 
 const MAX_DETECTION_SAMPLE = 300
+const MIN_ABSOLUTE_MATCHES = 5
+const MAX_ORPHAN_RATIO = 0.5
 
 /**
  * Wählt bis zu `MAX_DETECTION_SAMPLE` nicht-leere Zeilen gleichmäßig über die ganze Datei
@@ -71,10 +74,10 @@ function sampleLines(lines: string[]): string[] {
 }
 
 function detectPattern(lines: string[]): DetectionResult {
-  if (lines.length === 0) return { pattern: null, confidence: 0 }
+  if (lines.length === 0) return { pattern: null, confidence: 0, bestCount: 0 }
 
   const sample = sampleLines(lines)
-  if (sample.length === 0) return { pattern: null, confidence: 0 }
+  if (sample.length === 0) return { pattern: null, confidence: 0, bestCount: 0 }
 
   const hits: Record<string, number> = {}
   for (const line of sample) {
@@ -86,13 +89,13 @@ function detectPattern(lines: string[]): DetectionResult {
   }
 
   const sorted = Object.entries(hits).sort((a, b) => b[1] - a[1])
-  if (sorted.length === 0) return { pattern: null, confidence: 0 }
+  if (sorted.length === 0) return { pattern: null, confidence: 0, bestCount: 0 }
 
   const [bestName, bestCount] = sorted[0]
   const confidence = bestCount / sample.length
 
   const pattern = PATTERNS.find((p) => p.name === bestName) ?? null
-  return { pattern, confidence }
+  return { pattern, confidence, bestCount }
 }
 
 /**
@@ -108,7 +111,7 @@ export function parseLogLines(text: string): ParseResult {
   const lines = trimmed.split(/\r?\n/)
   const detection = detectPattern(lines)
 
-  if (!detection.pattern || detection.confidence < 0.5) {
+  if (!detection.pattern) {
     return { entries: [], format: 'empty', fields: [], skipped: 0, skippedSamples: [] }
   }
 
@@ -159,6 +162,25 @@ export function parseLogLines(text: string): ParseResult {
 
   if (currentEntry) {
     entries.push(currentEntry)
+  }
+
+  // Die reine Zeilen-Übereinstimmungsrate (confidence) versagt bei Dateien, die
+  // ansonsten klar dem Format entsprechen, aber einen einzigen sehr langen
+  // mehrzeiligen Eintrag enthalten (z. B. ein eingebettetes JSON-Payload über
+  // hunderte Zeilen) — dieser Block drückt den Rohanteil treffender Zeilen weit
+  // unter 50 %, obwohl jede dieser Zeilen korrekt als Fortsetzung einer
+  // vorherigen Zeile gemerged wurde. Wir akzeptieren das erkannte Format daher
+  // auch dann, wenn genug Zeilen absolut getroffen haben und die tatsächlich
+  // verwaisten (nicht zuordenbaren) Zeilen nach dem Merging eine Minderheit sind.
+  const nonBlankTotal = lines.reduce((n, l) => n + (l.trim() !== '' ? 1 : 0), 0)
+  const orphanRatio = nonBlankTotal > 0 ? skipped / nonBlankTotal : 1
+  const accepted =
+    entries.length > 0 &&
+    (detection.confidence >= 0.5 ||
+      (detection.bestCount >= MIN_ABSOLUTE_MATCHES && orphanRatio <= MAX_ORPHAN_RATIO))
+
+  if (!accepted) {
+    return { entries: [], format: 'empty', fields: [], skipped: 0, skippedSamples: [] }
   }
 
   return {
