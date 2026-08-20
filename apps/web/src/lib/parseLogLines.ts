@@ -1,4 +1,4 @@
-import type { LogFormat, ParseResult, RawRecord } from './types'
+import type { ParseResult, RawRecord } from './types'
 
 const MAX_SKIPPED_SAMPLES = 5
 
