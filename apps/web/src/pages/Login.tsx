@@ -36,12 +36,12 @@ export default function Login() {
 
         <label className="mb-1 block text-sm font-medium">E-Mail-Adresse</label>
         <input
-          type="email"
+          type="text"
           className="mb-4 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 outline-none focus:border-blue-500 dark:border-slate-700"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoFocus
-          autoComplete="email"
+          autoComplete="username"
         />
 
         <label className="mb-1 block text-sm font-medium">Passwort</label>
